@@ -43,10 +43,12 @@ client.on('ready', async () => {
     const channel = client.channels.cache.get(config.newbieRoleChannelId);
 
     const message = await channel.send({
-        content: '안녕하세요! 이전에 안내 아래 버튼을 클릭해서 간단한 자기소개 작성 부탁드립니다. \n'
-        + '순둥부는 2003년 포함 그 이전 출생자로만 운영되는 서버입니다. 확인을 위해 생일 정보를 받고있으며 역할 지급 후 즉시 삭제하고 있습니다. \n'
-        + '정상적으로 진행이 안되는 경우 관리자 또는 운영진 역할 언급 부탁드립니다.'
-        + '신입 역할을 받으시면 서버 활동을 하실 수 있습니다. 잘 부탁 드립니다 :)',
+        content: '```안녕하세요! 이전에 안내 드린 대로 간단한 자기소개 작성 부탁드립니다. \n'
+          + '* 성별 / 출생년도 작성하신 후 기다려 주세요!  \n'
+          + '(2003년 포함 그 이전 출생자로만 운영되는 서버입니다. ) \n'
+          + '확인 후 신입 역할을 지급 해 드리겠습니다. \n'
+          + '개인정보는 역할 지급 후 즉시 삭제해드리며, 신입 역할을 받으시면 서버 활동을 하실수 있습니다. \n'
+          + '잘 부탁 드립니다 :)```',
         components: [new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId('startSurvey')
@@ -87,41 +89,54 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isModalSubmit()) return;
 
     if (interaction.customId === 'surveyModal') {
-        const gender = interaction.fields.getTextInputValue('genderInput');
-        let birthYear = interaction.fields.getTextInputValue('birthYearInput');
+        await interaction.reply({ content: '설문 처리를 진행 중입니다...', ephemeral: true });
+
+        const gender = interaction.fields.getTextInputValue('genderInput').trim();
+        let birthYear = interaction.fields.getTextInputValue('birthYearInput').trim();
 
         if (gender != '남' && gender != '여' && gender != '남자' && gender != "여자")
-          return interaction.reply({ content: '입력하신 성별이 올바르지 않습니다.', ephemeral: true });
+          return interaction.editReply({ content: '입력하신 성별이 올바르지 않습니다.', ephemeral: true });
 
         birthYear = parseInt(birthYear, 10);
 
         if (isNaN(birthYear) || !Number.isInteger(birthYear) || birthYear.toString().length != 4 || birthYear < 1900)
-          return interaction.reply({ content: '입력하신 출생년도가 올바르지 않습니다.', ephemeral: true });
+          return interaction.editReply({ content: '입력하신 출생년도가 올바르지 않습니다.', ephemeral: true });
 
 
         if (birthYear >= 2003)
-          return interaction.reply({ content: '관리자 또는 운영진 맨션 부탁드립니다.', ephemeral: true });
+          return interaction.editReply({ content: '관리자 또는 운영진 맨션 부탁드립니다.', ephemeral: true });
 
-        InsertMemberData(interaction.member.displayName, gender, birthYear.toString());
+        await InsertMemberData(interaction.member.displayName, gender, birthYear.toString());
 
         const member = interaction.member;
         const role = interaction.guild.roles.cache.get(config.newbieRoleId);
+        const waitingMemberRole = interaction.guild.roles.cache.get(config.waitingMemberRoleId);
 
-        if (role && member) {
-          await member.roles.add(role);
+        try
+        {
+          if (role && member && waitingMemberRole) {
+            await member.roles.add(role);
 
-          const mainChatingChannel = interaction.guild.channels.cache.get(config.mainChatingChannelId);
+            await member.roles.remove(waitingMemberRole);
 
-          if (mainChatingChannel)
-            await mainChatingChannel.send(`${member} 어서오세요! 자기소개 게시판에도 양식에 맞게 소개작성 부탁드리겠습니다~`);
-          else
-            return interaction.reply({ content: '[에러 케이스 1]관리자 또는 운영진 맨션 부탁드립니다.', ephemeral: true });
+            const mainChatingChannel = interaction.guild.channels.cache.get(config.mainChatingChannelId);
 
-        } else {
-            return interaction.reply({ content: '[에러 케이스 2]관리자 또는 운영진 맨션 부탁드립니다.', ephemeral: true });
+            if (mainChatingChannel)
+            {
+              await mainChatingChannel.send(`${member} 어서오세요! 자기소개 게시판에도 양식에 맞게 소개작성 부탁드리겠습니다~`);
+            }
+            else
+              return interaction.editReply({ content: '[에러 케이스 1]관리자 또는 운영진 맨션 부탁드립니다.', ephemeral: true });
+
+          } else {
+              return interaction.editReply({ content: '[에러 케이스 2]관리자 또는 운영진 맨션 부탁드립니다.', ephemeral: true });
+          }
         }
-
-        await interaction.deferUpdate();
+        catch (error)
+        {
+            console.error('Error handling interaction:', error);
+            return interaction.editReply({ content: '[에러 케이스 3]관리자 또는 운영진 맨션 부탁드립니다.', ephemeral: true });
+        }
     }
 });
 
