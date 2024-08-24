@@ -1,0 +1,10 @@
+# .gitignore
+
+# Node.js 관련 무시 파일
+node_modules/
+npm-debug.log
+.env
+
+# config 및 credentials 파일 무시
+config.json
+credentials.json

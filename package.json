@@ -1,0 +1,30 @@
+{
+  "name": "dobby",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dobby.js",
+  "dependencies": {
+    "axios": "^1.7.4",
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "google-auth-library": "^9.13.0",
+    "google-spreadsheet": "^4.1.2",
+    "googleapis": "^142.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ttuseong/dobby.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ttuseong/dobby/issues"
+  },
+  "homepage": "https://github.com/ttuseong/dobby#readme"
+}
