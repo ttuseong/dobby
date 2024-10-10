@@ -103,10 +103,16 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return interaction.editReply({ content: '입력하신 출생년도가 올바르지 않습니다.', ephemeral: true });
 
 
-        if (birthYear >= 2003)
-          return interaction.editReply({ content: '관리자 또는 운영진 맨션 부탁드립니다.', ephemeral: true });
+        if (birthYear > 2003)
+        {
+          console.log("입력한 생일 : " + birthYear);
 
-        await InsertMemberData(interaction.member.displayName, gender, birthYear.toString());
+          return interaction.editReply({ content: '관리자 또는 운영진 맨션 부탁드립니다.', ephemeral: true });
+        }
+
+        var birthString = birthYear.toString().slice(-2) + "년생";
+
+        await InsertMemberData(interaction.member.displayName, gender, birthString);
 
         const member = interaction.member;
         const role = interaction.guild.roles.cache.get(config.newbieRoleId);
@@ -126,9 +132,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
               await mainChatingChannel.send(`${member} 어서오세요! 자기소개 게시판에도 양식에 맞게 소개작성 부탁드리겠습니다~`);
             }
             else
+            {
+              console.log("대화방을 찾을 수 없다..! : " + mainChatingChannel);
               return interaction.editReply({ content: '[에러 케이스 1]관리자 또는 운영진 맨션 부탁드립니다.', ephemeral: true });
-
-          } else {
+            }
+          }
+          else {
+              console.log("role : " + role + ", member : " + member + ", waitingMemberRole : " + waitingMemberRole);
               return interaction.editReply({ content: '[에러 케이스 2]관리자 또는 운영진 맨션 부탁드립니다.', ephemeral: true });
           }
         }
