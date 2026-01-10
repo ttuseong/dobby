@@ -45,7 +45,7 @@ client.on('ready', async () => {
     const message = await channel.send({
         content: '```안녕하세요! 이전에 안내 드린 대로 간단한 자기소개 작성 부탁드립니다. \n'
           + '* 성별 / 출생년도 작성하신 후 기다려 주세요!  \n'
-          + '(2004년 포함 그 이전 출생자로만 운영되는 서버입니다. ) \n'
+          + '(2005년 포함 그 이전 출생자로만 운영되는 서버입니다. ) \n'
           + '확인 후 신입 역할을 지급 해 드리겠습니다. \n'
           + '개인정보는 역할 지급 후 즉시 삭제해드리며, 신입 역할을 받으시면 서버 활동을 하실수 있습니다. \n'
           + '잘 부탁 드립니다 :)```',
@@ -103,7 +103,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return interaction.editReply({ content: '입력하신 출생년도가 올바르지 않습니다.', ephemeral: true });
 
 
-        if (birthYear > 2004)
+        if (birthYear > 2005)
         {
           console.log("입력한 생일 : " + birthYear);
 
